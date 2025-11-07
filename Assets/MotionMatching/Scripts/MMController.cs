@@ -7,59 +7,54 @@ using UnityEngine.UIElements;
 
 public class MMController : MonoBehaviour
 {
-    private PoseDataBase PDB;
+    private PoseDataBase m_PDB;
+    private PoseDataConverter m_PDC = new PoseDataConverter();
 
     [SerializeField] private AnimationClip clip;
     [SerializeField] private Animator anim;
+    [SerializeField] private SearchAndSaveType m_SST;
 
     private void OnValidate()
     {
-        if (clip != null)
+        //AnimationClip Data grabbing
+        /*if (clip != null)
         {
             
             EditorCurveBinding[] bindings = AnimationUtility.GetCurveBindings(clip);
             AnimationClipCurveData[] animationCurvesData = new AnimationClipCurveData[bindings.Length];
+            Transform[] allBones = anim.GetComponentsInChildren<Transform>();
 
             for (int i = 0; i < animationCurvesData.Length; i++) 
             {
                 animationCurvesData[i] = new AnimationClipCurveData(bindings[i]);
                 animationCurvesData[i].curve = AnimationUtility.GetEditorCurve(clip, bindings[i]);
-            }
+            }            
+        }*/
 
-            foreach (var curve in animationCurvesData)
-            {
-                if (curve.path.Equals(""))
-                    continue;
-                //int lastSlash = curve.path.LastIndexOf('/');
-                //Debug.Log($"Curves Path: {curve.path} Property Name: {curve.propertyName}");
-                //Debug.Log($"Curves Path: {(lastSlash >= 0 ? curve.path.Substring(lastSlash + 1) : curve.path)} Property Name: {curve.propertyName}");
-
-            }
-
-            Transform[] allBones = anim.GetComponentsInChildren<Transform>();
-
-            foreach (var transform in allBones) 
-            {
-                foreach (var curve in animationCurvesData)
+        switch (m_SST)
+        {
+            case SearchAndSaveType.Regular:
                 {
-                    int lastSlash = curve.path.LastIndexOf('/');
-                    if ((lastSlash >= 0 ? curve.path.Substring(lastSlash + 1) : curve.path).Equals(transform.name))
-                    {
-                        //Debug.Log(transform.name);
-                        Debug.Log($"Bone Name: {transform.name} Value: {curve.curve.Evaluate(1)} Test: {curve.propertyName}");
-                    }
-                    else 
-                    {
-                        //Debug.Log($"Bsone Name: {transform.name} Value: {transform.localPosition}");
-                    }
+                    m_PDC.ConvertData(m_SST);
+                    break;
                 }
-            }
-
+            case SearchAndSaveType.Split:
+                {
+                    m_PDC.ConvertData(m_SST);
+                    break;
+                }
+            case SearchAndSaveType.Context:
+                {
+                    m_PDC.ConvertData(m_SST);
+                    break;
+                }
+            case SearchAndSaveType.Heirarchy:
+                {
+                    m_PDC.ConvertData(m_SST);
+                    break;
+                }
+            default: break;
         }
-
-        //Get bones and curves
-        //Convert convert frames to time
-        //Get values ad said time
     }
 
 }
