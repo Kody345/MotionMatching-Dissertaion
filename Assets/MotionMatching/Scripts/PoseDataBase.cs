@@ -8,6 +8,7 @@ using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 using UnityEngine.UIElements;
 using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 using static UnityEditor.PlayerSettings;
@@ -21,6 +22,7 @@ namespace MMSystem
         private Transform LFoot;
         private Transform RFoot;
         private Transform Root;
+        float fullTime = 0.0f;
 
         public void SaveDataType(SearchAndSaveType type) { m_SaveType = type; }
 
@@ -55,6 +57,7 @@ namespace MMSystem
 
             for (int i = 0; i < clips.Length; i++)
             {
+                fullTime += clips[i].length;
                 for (float t = 0f; t <= clips[i].length; t += 1f / clips[i].frameRate)
                 {
                     //test = t * clips[i].frameRate;
@@ -115,57 +118,6 @@ namespace MMSystem
                 }
             }
 
-            
-
-            for (int i = 0; i < m_poses.Length; i++)
-            {
-                m_poses[i].m_FuturePos = new Trajectory[3];
-
-                if (m_poses[i].frame >= (int)(m_poses[i].m_Clip.frameRate * m_poses[i].m_Clip.length))
-                    continue;
-
-                Trajectory t = new Trajectory();
-                Vector3 pos = new Vector3();
-
-                foreach (var bone in m_poses[i].m_Bones)
-                {
-                    if (bone.m_Name == RootBone.name)
-                    {
-                        pos = bone.m_BonePos;
-                        break;
-                    }
-                }
-
-                t.m_FuturePos = new Vector3(pos.x, pos.y, pos.z);
-                m_poses[i].m_FuturePos[0] = t;
-
-
-            }
-
-            for (int i = 0; i < m_poses.Length; i++)
-            {
-                int frame = 0;
-
-                for (int j = 1; j < 3; j++)
-                {
-                    frame += (int)((1f / 3f) / (1f / m_poses[i].m_Clip.frameRate));
-                    if ((frame + m_poses[i].frame) > (int)(m_poses[i].m_Clip.length * m_poses[i].m_Clip.frameRate))
-                    {
-                        break;
-                    }
-
-                    if ((i + frame) >= m_poses.Length)
-                        break;
-
-                    if (m_poses[i].m_Clip.name != m_poses[i + frame].m_Clip.name)
-                        break;
-
-                    m_poses[i].m_FuturePos[j].m_FuturePos = m_poses[i + frame].m_FuturePos[0].m_FuturePos;
-                }
-
-                m_poses[i].dir = Vector3.Normalize(m_poses[i].m_FuturePos[1].m_FuturePos - m_poses[i].m_FuturePos[0].m_FuturePos);
-            }
-
             //Setting Delta Motion
             foreach (var clip in clips)
             {
@@ -192,23 +144,41 @@ namespace MMSystem
             for (int i = 0; i < m_features.Length; i++) 
             {
                 SetupPos(ref m_features[i], m_poses);
-                Trajectory(m_features[i], m_poses);
+                Trajectory(ref m_features[i], m_poses);
             }
 
             SetuptVel(m_features, m_poses);
-
+            CalcRootToFoot(m_features, m_poses);
             
 
             for (int i = 0; i < m_features.Length; i++) 
             {
                 int c = 0;
-                m_features[i].m_FeatureVector = new float[6];
+                m_features[i].m_FeatureVector = new float[15];
                 AddVector3ToFeatureVector(m_features[i].m_FeatureVector, m_features[i].m_CurrentLFootVel, ref c);
                 AddVector3ToFeatureVector(m_features[i].m_FeatureVector, m_features[i].m_CurrentRFootVel, ref c);
+                AddVector3ToFeatureVector(m_features[i].m_FeatureVector, m_features[i].m_CurrentLFootPos, ref c);
+                AddVector3ToFeatureVector(m_features[i].m_FeatureVector, m_features[i].m_CurrentRFootPos, ref c);
+                AddVector3ToFeatureVector(m_features[i].m_FeatureVector, m_features[i].m_CurrentHipVel, ref c);
+                //AddVector3ToFeatureVector(m_features[i].m_FeatureVector, m_poses[m_features[i].poseIndex].dir * 5f, ref c);
+
+                //Trajectories
+                //for (int j = 0; j < 3; j++) 
+                //{
+                //    AddVector3ToFeatureVector(m_features[i].m_FeatureVector, (Vector3)m_features[i].trajectories[j].m_FuturePos, ref c);
+                //}
 
                 m_poses[m_features[i].poseIndex].feature = m_features[i];
             }
+        }
 
+        private void CalcRootToFoot(FeatureVector[] fv, MMSystem.Pose[] poses) 
+        {
+            for (int i = 0; i < fv.Length; i++) 
+            {
+                fv[i].m_CurrentLFootPos = fv[i].m_CurrentLFootPos - fv[i].m_CurrentHipPos;
+                fv[i].m_CurrentRFootPos = fv[i].m_CurrentRFootPos - fv[i].m_CurrentHipPos;
+            }
         }
 
         private void SetuptVel(FeatureVector[] fv, MMSystem.Pose[] poses) 
@@ -250,30 +220,74 @@ namespace MMSystem
             }
         }
 
-        private void Trajectory(FeatureVector fv, MMSystem.Pose[] poses) 
+        private void Trajectory(ref FeatureVector fv, MMSystem.Pose[] poses) 
         {
-            int frameCount;
+            int tCount = 2;
+            int frameCount = 0;
+            Vector3 fullDelta = new Vector3();
 
-            if ((int)(((poses[fv.poseIndex].m_Clip.length * 30) - 2) - (poses[fv.poseIndex].m_Time * 30)) > 2)
+            fv.trajectories = new Trajectory[3];
+
+            for (int i = 0; i < fv.trajectories.Length; i++) 
             {
-                
-                frameCount = 3;
-            }
-            else
-            {
-                frameCount = (int)(((poses[fv.poseIndex].m_Clip.length * 30) - 2) - (poses[fv.poseIndex].m_Time * 30));
+                fv.trajectories[i].m_FuturePos = new Vector3();
             }
 
-            if (frameCount <= 0)
-                return;
-            
-            fv.trajectories = new Trajectory[frameCount];
-
-            for (int i = 0; i < frameCount; i++) 
+            for (float i = (fv.poseIndex / 30f) + 1f / 30f; i < fullTime; i += 1f / 30f)
             {
-                fv.trajectories[i] = new Trajectory();
-                fv.trajectories[i].m_FuturePos = new Vector3(poses[fv.poseIndex + i].rootPos.x, 0f, poses[fv.poseIndex].rootPos.z);
+                Debug.Log($"I: {i} Index: {(int)(i * 30f)}");
+
+                fullDelta += poses[(int)(i * 30f)].deltaPos;
+
+                if (frameCount == 3)
+                {
+                    //fv.trajectories[tCount].m_FuturePos = new Vector3();
+                    fv.trajectories[tCount].m_FuturePos = fullDelta;
+                    fv.trajectories[tCount].m_FutureTime = frameCount;
+                    tCount--;
+                }
+
+                if (frameCount == 6) 
+                {
+                    //fv.trajectories[tCount].m_FuturePos = new Vector3();
+                    fv.trajectories[tCount].m_FuturePos = fullDelta;
+                    fv.trajectories[tCount].m_FutureTime = frameCount;
+                    tCount--;
+                }
+
+                if (frameCount == 9)
+                {
+                    //fv.trajectories[tCount].m_FuturePos = new Vector3();
+                    fv.trajectories[tCount].m_FuturePos = fullDelta;
+                    fv.trajectories[tCount].m_FutureTime = frameCount;
+                    tCount--;
+                }
+
+                if (tCount == 0)
+                    break;
+
+                frameCount++;
             }
+
+            Trajectory[] t = new Trajectory[fv.trajectories.Length];
+            int newTrajCount = fv.trajectories.Length - 1;
+
+            for (int i = fv.trajectories.Length - 1; i >= 0; i--) 
+            {
+                if (fv.trajectories[i].m_FuturePos != null) 
+                {
+                    t[newTrajCount].m_FuturePos = fv.trajectories[i].m_FuturePos;
+                    t[newTrajCount].m_FutureTime = fv.trajectories[i].m_FutureTime;
+                    newTrajCount--;
+                }
+            }
+
+            for (;newTrajCount >= 0; newTrajCount--) 
+            {
+                t[newTrajCount].m_FuturePos = Vector3.zero;
+            }
+
+            fv.trajectories = t;
         }
 
         private void AddVector3ToFeatureVector(float[] fv, Vector3 v, ref int i) 

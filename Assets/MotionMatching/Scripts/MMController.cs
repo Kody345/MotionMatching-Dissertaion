@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using TreeEditor;
 using Unity.VisualScripting;
 using UnityEditor;
@@ -26,6 +27,7 @@ public class MMController : MonoBehaviour
     [SerializeField] private Transform m_RFootBone;
     [SerializeField] private SearchAndSaveType m_SST;
     [SerializeField] private GameObject cube;
+    [SerializeField] private float _PoseFavourWeight;
 
     private MMSystem.Pose pose = new MMSystem.Pose();
     private Transform[] bones;
@@ -34,6 +36,7 @@ public class MMController : MonoBehaviour
     private int num;
     private Coroutine testCo;
     private int i = 0;
+    private bool test = false;
 
     private void OnValidate()
     {
@@ -201,10 +204,13 @@ public class MMController : MonoBehaviour
             }
         }*/
 
-        if (pose.id > 1000) 
+        if (pose.id > 1000)
         {
             pose = m_Poses[0];
         }
+
+        if (i >= m_Poses.Length)
+            i = 0;
 
         /*foreach (var bone in bones)
         {
@@ -238,23 +244,38 @@ public class MMController : MonoBehaviour
         //vector.featureVector =  new[] { m_LFootBone.localPosition, m_RFootBone.localPosition, m_RootBone.localPosition, dir * 2f}.SelectMany(v => new[] { v.x, v.y, v.z }).ToArray();
         vector = pose.feature;
 
+        for (int i = 0; i < m_Features.Length; i++)
+        {
+            int c = 0;
+            m_Features[i].m_FeatureVector = new float[15];
+            AddVector3ToFeatureVector(vector.m_FeatureVector, vector.m_CurrentLFootVel, ref c);
+            AddVector3ToFeatureVector(vector.m_FeatureVector, vector.m_CurrentRFootVel, ref c);
+            AddVector3ToFeatureVector(vector.m_FeatureVector, vector.m_CurrentLFootPos, ref c);
+            AddVector3ToFeatureVector(vector.m_FeatureVector, vector.m_CurrentRFootPos, ref c);
+            AddVector3ToFeatureVector(vector.m_FeatureVector, vector.m_CurrentHipVel, ref c);
+            //AddVector3ToFeatureVector(vector.m_FeatureVector, dir * 5f, ref c);
+
+            //    for (int j = 0; j < 3; j++)
+            //    {
+            //        AddVector3ToFeatureVector(vector.m_FeatureVector, dir, ref c);
+            //    }
+        }
+
         foreach (var p in m_Poses)
         {
-            if (Vector3.Dot(p.dir, dir) < 0.7f)
-                continue;
+            //if (Vector3.Dot(m_Poses[vector.poseIndex].dir, dir) < 0.5f)
+            //    continue;
+
             float c = Cost(vector, p.feature);
+
             if (dist > c)
             {
-                if (vector.poseIndex == p.feature.poseIndex) 
-                {
-                    continue;
-                }
                 dist = c;
-                vector = p.feature;
-                i = vector.poseIndex;
+                i = p.feature.poseIndex;
             }
         }
 
+        UnityEngine.Debug.Log($"Total: {i}");
 
         foreach (var bone in bones)
         {
@@ -278,7 +299,9 @@ public class MMController : MonoBehaviour
         pose = m_Poses[i];
         nextTime += interval;
         float wait = nextTime - (float)timer.Elapsed.TotalSeconds;
+
         //i++;
+
         if (wait > 0f)
         {
             yield return new WaitForSecondsRealtime(wait);
@@ -295,15 +318,43 @@ public class MMController : MonoBehaviour
 
     private float Cost(FeatureVector currentPose, FeatureVector testingPose)
     {
+        test = true;
         float total = 0f;
+
+        int currentIndex = currentPose.poseIndex;
+        int testingIndex = testingPose.poseIndex;
+        float diff = testingIndex - currentIndex;
+
+        if (diff <= 0 && diff >= -8)
+        {
+            diff = 50 / _PoseFavourWeight;
+        }
+        else if (diff > 5)
+        {
+            diff = 25 / _PoseFavourWeight;
+        }
+        else
+        {
+            diff = 0;
+        }
+
         for (int j = 0; j < currentPose.m_FeatureVector.Length; j++)
         {
-            total += (currentPose.m_FeatureVector[j] - testingPose.m_FeatureVector[j]) * (currentPose.m_FeatureVector[j] - testingPose.m_FeatureVector[j]);
+            //UnityEngine.Debug.Log($"INdex: {j} Total: {total} Extra Cost: {diff} Current: {currentPose.m_FeatureVector[j]} Testing: {testingPose.m_FeatureVector[j]}");
+            total += Mathf.Sqrt((currentPose.m_FeatureVector[j] - testingPose.m_FeatureVector[j]) * (currentPose.m_FeatureVector[j] - testingPose.m_FeatureVector[j]));
         }
-        total = Mathf.Sqrt(total);
+
+        total += diff;
+
+        UnityEngine.Debug.Log($"T: {total} Extra Cost: {diff} Diff : {testingIndex - currentIndex} Current: {currentIndex} Testing: {testingIndex}");
+
         return total;
     }
 
-   
-
+    private void AddVector3ToFeatureVector(float[] fv, Vector3 v, ref int i)
+    {
+        fv[i++] = v.x;
+        fv[i++] = v.y;
+        fv[i++] = v.z;
+    }
 }
