@@ -28,15 +28,19 @@ public class MMController : MonoBehaviour
     [SerializeField] private SearchAndSaveType m_SST;
     [SerializeField] private GameObject cube;
     [SerializeField] private float _PoseFavourWeight;
+    [SerializeField] private float speed = 0;
+    [SerializeField] private float index = 0;
+    [SerializeField] private float TrajectoryWeighting = 0f;
 
     private MMSystem.Pose pose = new MMSystem.Pose();
     private Transform[] bones;
     private MMSystem.Pose[] m_Poses;
     private FeatureVector[] m_Features;
-    private int num;
     private Coroutine testCo;
     private int i = 0;
-    private bool test = false;
+    private Vector3 direct;
+    private FeatureVector curr;
+    private float time = (1f / 30f);
 
     private void OnValidate()
     {
@@ -81,26 +85,26 @@ public class MMController : MonoBehaviour
             StartCoroutine(AnimImplement(Vector3.zero));
         }
 
-        if (Input.GetKeyDown(KeyCode.W))
+        if (Input.GetKey(KeyCode.W))
         {
             //MovementImplement(Vector3.back);
             if (testCo == null)
-                testCo = StartCoroutine(AnimImplement(Vector3.back));
+                testCo = StartCoroutine(AnimImplement(Vector3.forward));
         }
         if (Input.GetKey(KeyCode.A))
         {
             if (testCo == null)
-                testCo = StartCoroutine(AnimImplement(Vector3.right));
+                testCo = StartCoroutine(AnimImplement(Vector3.left));
         }
         if (Input.GetKey(KeyCode.D))
         {
             if (testCo == null)
-                testCo = StartCoroutine(AnimImplement(Vector3.left));
+                testCo = StartCoroutine(AnimImplement(Vector3.right));
         }
         if (Input.GetKey(KeyCode.S))
         {
             if (testCo == null)
-                testCo = StartCoroutine(AnimImplement(Vector3.forward));
+                testCo = StartCoroutine(AnimImplement(Vector3.back));
         }
 
     }
@@ -112,6 +116,8 @@ public class MMController : MonoBehaviour
         timer.Start();
         float nextTime = 0;
         MMSystem.FeatureVector vector = new MMSystem.FeatureVector();
+
+        direct = dir;
 
         float dist = 100000000f;
 
@@ -243,39 +249,78 @@ public class MMController : MonoBehaviour
 
         //vector.featureVector =  new[] { m_LFootBone.localPosition, m_RFootBone.localPosition, m_RootBone.localPosition, dir * 2f}.SelectMany(v => new[] { v.x, v.y, v.z }).ToArray();
         vector = pose.feature;
-
-        for (int i = 0; i < m_Features.Length; i++)
+        /*for (int i = 0; i < m_Features.Length; i++)
         {
             int c = 0;
-            m_Features[i].m_FeatureVector = new float[15];
+            m_Features[i].m_FeatureVector = new float[24];
             AddVector3ToFeatureVector(vector.m_FeatureVector, vector.m_CurrentLFootVel, ref c);
             AddVector3ToFeatureVector(vector.m_FeatureVector, vector.m_CurrentRFootVel, ref c);
             AddVector3ToFeatureVector(vector.m_FeatureVector, vector.m_CurrentLFootPos, ref c);
             AddVector3ToFeatureVector(vector.m_FeatureVector, vector.m_CurrentRFootPos, ref c);
             AddVector3ToFeatureVector(vector.m_FeatureVector, vector.m_CurrentHipVel, ref c);
-            //AddVector3ToFeatureVector(vector.m_FeatureVector, dir * 5f, ref c);
 
-            //    for (int j = 0; j < 3; j++)
-            //    {
-            //        AddVector3ToFeatureVector(vector.m_FeatureVector, dir, ref c);
-            //    }
-        }
+            AddVector3ToFeatureVector(vector.m_FeatureVector, dir * 0, ref c);
+            AddVector3ToFeatureVector(vector.m_FeatureVector, dir * speed * (time * 6f), ref c);
+            AddVector3ToFeatureVector(vector.m_FeatureVector, dir * speed * (time * 12f), ref c);
+
+            //for (int j = 0; j < 3; j++)
+            //{
+            //    AddVector3ToFeatureVector(vector.m_FeatureVector, dir, ref c);
+            //}
+        }*/
+        
 
         foreach (var p in m_Poses)
         {
             //if (Vector3.Dot(m_Poses[vector.poseIndex].dir, dir) < 0.5f)
             //    continue;
 
-            float c = Cost(vector, p.feature);
+            //float c = Cost(vector, p.feature);
+            float totalCost = 0.0f;
+            FeatureVector fv = p.feature;
 
-            if (dist > c)
+            int currentIndex = vector.poseIndex;
+            int testingIndex = fv.poseIndex;
+            float diff = testingIndex - currentIndex;
+
+            if (diff <= 0 && diff >= -15)
             {
-                dist = c;
+                diff = 10f / _PoseFavourWeight;
+            }
+            else if (diff > 5)
+            {
+                diff = 8f / _PoseFavourWeight;
+            }
+            else
+            {
+                diff = 0;
+            }
+            
+            totalCost += diff;
+
+            AddVector3Cost(3f, vector.m_CurrentLFootVel, fv.m_CurrentLFootVel, ref totalCost);
+            AddVector3Cost(3f, vector.m_CurrentRFootVel, fv.m_CurrentRFootVel, ref totalCost);
+            AddVector3Cost(1f, vector.m_CurrentRFootPos, fv.m_CurrentRFootPos, ref totalCost);
+            AddVector3Cost(1f, vector.m_CurrentLFootPos, fv.m_CurrentLFootPos, ref totalCost);
+            AddVector3Cost(1f, vector.m_CurrentHipVel, fv.m_CurrentHipVel, ref totalCost);
+
+            UnityEngine.Debug.Log($"Current Index: {vector.poseIndex} Testing Index: {fv.poseIndex} Before: {totalCost}");
+            AddVector3Cost(TrajectoryWeighting, direct * speed * time * 6f, fv.m_CurrentHipVel, ref totalCost);
+            AddVector3Cost(TrajectoryWeighting, direct * speed * time * 12, fv.m_CurrentHipVel, ref totalCost);
+            AddVector3Cost(TrajectoryWeighting, direct * speed * time * 18, fv.m_CurrentHipVel, ref totalCost);
+            UnityEngine.Debug.Log($"Current Index: {vector.poseIndex} Testing Index: {fv.poseIndex} After: {totalCost}");
+
+            curr = p.feature;
+
+            if (dist > totalCost)
+            {
+                dist = totalCost;
                 i = p.feature.poseIndex;
             }
         }
 
-        UnityEngine.Debug.Log($"Total: {i}");
+        UnityEngine.Debug.Log($"Chosen Index: {i}");
+
 
         foreach (var bone in bones)
         {
@@ -318,7 +363,6 @@ public class MMController : MonoBehaviour
 
     private float Cost(FeatureVector currentPose, FeatureVector testingPose)
     {
-        test = true;
         float total = 0f;
 
         int currentIndex = currentPose.poseIndex;
@@ -327,11 +371,11 @@ public class MMController : MonoBehaviour
 
         if (diff <= 0 && diff >= -8)
         {
-            diff = 50 / _PoseFavourWeight;
+            diff = 15 / _PoseFavourWeight;
         }
         else if (diff > 5)
         {
-            diff = 25 / _PoseFavourWeight;
+            diff = 8 / _PoseFavourWeight;
         }
         else
         {
@@ -346,7 +390,7 @@ public class MMController : MonoBehaviour
 
         total += diff;
 
-        UnityEngine.Debug.Log($"T: {total} Extra Cost: {diff} Diff : {testingIndex - currentIndex} Current: {currentIndex} Testing: {testingIndex}");
+        UnityEngine.Debug.Log($"T: {total} Exta Cost: {diff} Diff : {testingIndex - currentIndex} Current: {currentIndex} Testing: {testingIndex}");
 
         return total;
     }
@@ -357,4 +401,26 @@ public class MMController : MonoBehaviour
         fv[i++] = v.y;
         fv[i++] = v.z;
     }
+
+    private void AddVector3Cost(float weighting, Vector3 c, Vector3 t, ref float total) 
+    {
+        total += weighting * Mathf.Sqrt(((c.x - t.x) * (c.x - t.x)));
+        total += weighting * Mathf.Sqrt(((c.y - t.y) * (c.y - t.y)));
+        total += weighting * Mathf.Sqrt(((c.z - t.z) * (c.z - t.z)));
+    }
+
+    private void OnDrawGizmos()
+    {
+        float size = 0.05f;
+        float origin = 0.1f;
+        Gizmos.DrawCube((direct * speed * time * 6f) + gameObject.transform.position, new Vector3(origin, origin, origin));
+        Gizmos.DrawCube(direct * speed * time * 12f + gameObject.transform.position, new Vector3(origin, origin, origin));
+        Gizmos.DrawCube(direct * speed * time * 18f + gameObject.transform.position, new Vector3(origin, origin, origin));
+
+        for (int j = 0; j < m_Features[i].trajectories.Length; j++)
+        {
+            Gizmos.DrawCube((Vector3)m_Features[i].trajectories[j].m_FuturePos, new Vector3(size, size, size));
+        }
+    }
+
 }

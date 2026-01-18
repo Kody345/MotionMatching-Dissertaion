@@ -154,7 +154,7 @@ namespace MMSystem
             for (int i = 0; i < m_features.Length; i++) 
             {
                 int c = 0;
-                m_features[i].m_FeatureVector = new float[15];
+                m_features[i].m_FeatureVector = new float[24];
                 AddVector3ToFeatureVector(m_features[i].m_FeatureVector, m_features[i].m_CurrentLFootVel, ref c);
                 AddVector3ToFeatureVector(m_features[i].m_FeatureVector, m_features[i].m_CurrentRFootVel, ref c);
                 AddVector3ToFeatureVector(m_features[i].m_FeatureVector, m_features[i].m_CurrentLFootPos, ref c);
@@ -163,10 +163,10 @@ namespace MMSystem
                 //AddVector3ToFeatureVector(m_features[i].m_FeatureVector, m_poses[m_features[i].poseIndex].dir * 5f, ref c);
 
                 //Trajectories
-                //for (int j = 0; j < 3; j++) 
-                //{
-                //    AddVector3ToFeatureVector(m_features[i].m_FeatureVector, (Vector3)m_features[i].trajectories[j].m_FuturePos, ref c);
-                //}
+                for (int j = 0; j < 3; j++)
+                {
+                    AddVector3ToFeatureVector(m_features[i].m_FeatureVector, (Vector3)m_features[i].trajectories[j].m_FuturePos, ref c);
+                }
 
                 m_poses[m_features[i].poseIndex].feature = m_features[i];
             }
@@ -192,9 +192,22 @@ namespace MMSystem
                 fv[i].m_CurrentRFootVel = new Vector3();
                 fv[i].m_CurrentHipVel = new Vector3();
 
+                if (i >= fv.Length - 1) 
+                {
+                    fv[i].m_CurrentLFootVel = fv[i - 1].m_CurrentLFootPos;
+                    fv[i].m_CurrentRFootVel = fv[i - 1].m_CurrentRFootPos;
+                    fv[i].m_CurrentHipVel = fv[i - 1].m_CurrentHipPos;
+                    continue;
+                }
+
+
                 fv[i].m_CurrentLFootVel = fv[i + 1].m_CurrentLFootPos - fv[i].m_CurrentLFootPos;
                 fv[i].m_CurrentRFootVel = fv[i + 1].m_CurrentRFootPos - fv[i].m_CurrentRFootPos;
                 fv[i].m_CurrentHipVel = fv[i + 1].m_CurrentHipPos - fv[i].m_CurrentHipPos;
+
+                //fv[i].m_CurrentLFootVel = Vector3.Normalize(fv[i + 1].m_CurrentLFootPos - fv[i].m_CurrentLFootPos);
+                //fv[i].m_CurrentRFootVel = Vector3.Normalize(fv[i + 1].m_CurrentRFootPos - fv[i].m_CurrentRFootPos);
+                //fv[i].m_CurrentHipVel = Vector3.Normalize(fv[i + 1].m_CurrentHipPos - fv[i].m_CurrentHipPos);
             }
         }
 
@@ -222,7 +235,7 @@ namespace MMSystem
 
         private void Trajectory(ref FeatureVector fv, MMSystem.Pose[] poses) 
         {
-            int tCount = 2;
+            int tCount = 0;
             int frameCount = 0;
             Vector3 fullDelta = new Vector3();
 
@@ -235,59 +248,48 @@ namespace MMSystem
 
             for (float i = (fv.poseIndex / 30f) + 1f / 30f; i < fullTime; i += 1f / 30f)
             {
-                Debug.Log($"I: {i} Index: {(int)(i * 30f)}");
 
                 fullDelta += poses[(int)(i * 30f)].deltaPos;
 
                 if (frameCount == 3)
                 {
                     //fv.trajectories[tCount].m_FuturePos = new Vector3();
-                    fv.trajectories[tCount].m_FuturePos = fullDelta;
+                    fv.trajectories[tCount].m_FuturePos = new Vector3(fullDelta.x, 0f, fullDelta.z);
                     fv.trajectories[tCount].m_FutureTime = frameCount;
-                    tCount--;
+                    tCount++;
                 }
 
                 if (frameCount == 6) 
                 {
                     //fv.trajectories[tCount].m_FuturePos = new Vector3();
-                    fv.trajectories[tCount].m_FuturePos = fullDelta;
+                    fv.trajectories[tCount].m_FuturePos = new Vector3(fullDelta.x, 0f, fullDelta.z);
                     fv.trajectories[tCount].m_FutureTime = frameCount;
-                    tCount--;
+                    tCount++;
                 }
 
                 if (frameCount == 9)
                 {
                     //fv.trajectories[tCount].m_FuturePos = new Vector3();
-                    fv.trajectories[tCount].m_FuturePos = fullDelta;
+                    fv.trajectories[tCount].m_FuturePos = new Vector3(fullDelta.x, 0f, fullDelta.z);
                     fv.trajectories[tCount].m_FutureTime = frameCount;
-                    tCount--;
+                    tCount++;
                 }
 
-                if (tCount == 0)
+                if (tCount == 3)
                     break;
 
                 frameCount++;
             }
 
-            Trajectory[] t = new Trajectory[fv.trajectories.Length];
-            int newTrajCount = fv.trajectories.Length - 1;
+            if (tCount == 0)
+                fv.trajectories[0].m_FuturePos = new Vector3(fv.m_CurrentHipPos.x, 0f, fv.m_CurrentHipPos.z);
 
-            for (int i = fv.trajectories.Length - 1; i >= 0; i--) 
-            {
-                if (fv.trajectories[i].m_FuturePos != null) 
-                {
-                    t[newTrajCount].m_FuturePos = fv.trajectories[i].m_FuturePos;
-                    t[newTrajCount].m_FutureTime = fv.trajectories[i].m_FutureTime;
-                    newTrajCount--;
-                }
-            }
+            if (tCount == 1)
+                fv.trajectories[1].m_FuturePos = fv.trajectories[0].m_FuturePos;
 
-            for (;newTrajCount >= 0; newTrajCount--) 
-            {
-                t[newTrajCount].m_FuturePos = Vector3.zero;
-            }
-
-            fv.trajectories = t;
+            if (tCount == 2)
+                fv.trajectories[2].m_FuturePos = fv.trajectories[1].m_FuturePos;
+            
         }
 
         private void AddVector3ToFeatureVector(float[] fv, Vector3 v, ref int i) 
