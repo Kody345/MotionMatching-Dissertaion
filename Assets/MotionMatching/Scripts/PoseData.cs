@@ -23,7 +23,6 @@ namespace MMSystem
         public Trajectory[] trajectories;
 
         public float[] m_FeatureVector;
-        //public float[][] m_FeatureVector;
         public int poseIndex;
     }
 
@@ -33,7 +32,6 @@ namespace MMSystem
         public Vector3 m_BonePos;
         public Quaternion m_BoneRot;
         public Vector3 m_BoneWorldPos;
-        //Vector3 m_Velocity;
     }
 
     public struct Pose
@@ -48,11 +46,9 @@ namespace MMSystem
         public Vector3 deltaPos;
         public Quaternion rootRot;
         public Quaternion deltaRot;
-
-        public float testHipHeight;
+        public float HipHeight;
 
         public Bone[] m_Bones;
-        public Dictionary<string, Transform> BoneMap;
         public Trajectory[] m_FuturePos;
         public Vector3 dir;
         public FeatureVector feature;

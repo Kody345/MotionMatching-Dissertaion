@@ -545,7 +545,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 09f863286c252e64eb33a7e2e48c8b39, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.2751684
+      value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 09f863286c252e64eb33a7e2e48c8b39, type: 3}
       propertyPath: m_LocalPosition.y
@@ -553,7 +553,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 09f863286c252e64eb33a7e2e48c8b39, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1.9956098
+      value: 6.44
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 09f863286c252e64eb33a7e2e48c8b39, type: 3}
       propertyPath: m_LocalRotation.w
@@ -2030,7 +2030,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   clip: {fileID: 7400000, guid: e13ff28c2ee95b540866cdbd8d3c71f7, type: 2}
   clips:
-  - {fileID: 7400000, guid: 39a5790666a7ec94a9c5bd61abc9f783, type: 2}
+  - {fileID: 7400000, guid: b18b2ef6fe860134f81e381250845a55, type: 2}
   - {fileID: 7400000, guid: d0acf99ba626a934cacc7e92eda1fce8, type: 2}
   - {fileID: 7400000, guid: 3d03f35c6977ea14d8d154e2447b70f0, type: 2}
   - {fileID: 7400000, guid: 644086c8fbb45fe46a1c2c2e15d7a9a2, type: 2}
@@ -2039,11 +2039,10 @@ MonoBehaviour:
   m_LFootBone: {fileID: 1796382572}
   m_RFootBone: {fileID: 1796382571}
   m_SST: 0
-  cube: {fileID: 0}
-  _PoseFavourWeight: 10
+  _PoseFavourWeight: 8
   speed: 1.5
-  index: 2
   TrajectoryWeighting: 8.5
+  VelocityWeighting: 2
 --- !u!95 &1796382570
 Animator:
   serializedVersion: 7

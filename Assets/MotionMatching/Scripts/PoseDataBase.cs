@@ -50,6 +50,7 @@ namespace MMSystem
                 }
             }
 
+            //True if rootbone was not found
             if (rootBoneIndex == -1) { return; }
 
             int poseCount = 0;
@@ -60,14 +61,13 @@ namespace MMSystem
                 fullTime += clips[i].length;
                 for (float t = 0f; t <= clips[i].length; t += 1f / clips[i].frameRate)
                 {
-                    //test = t * clips[i].frameRate;
                     clips[i].SampleAnimation(anim.gameObject, t);
                     allBones = anim.GetComponentsInChildren<Transform>();
                     MMSystem.Pose pose = new MMSystem.Pose();
-                    
+                    int boneCount = 0;
+
 
                     pose.m_Time = t;
-                    int boneCount = 0;
                     pose.m_Bones = new Bone[allBones.Length - rootBoneIndex];
 
                     for (int j = rootBoneIndex; j < allBones.Length; j++)
@@ -85,14 +85,13 @@ namespace MMSystem
                         continue;
 
                     pose.frame = (int)(clips[i].frameRate * t);
-
                     pose.rootBone = allBones[rootBoneIndex];
 
                     if (pose.frame == 0)
                     {
                         startingFrame = poseCount;
                         pose.rootPos = pose.rootBone.position;
-                        pose.testHipHeight = pose.rootBone.position.y;
+                        pose.HipHeight = pose.rootBone.position.y;
 
                         pose.rootRot = pose.rootBone.rotation;
 
@@ -102,7 +101,7 @@ namespace MMSystem
                     else
                     {
                         pose.rootPos = pose.rootBone.position - m_poses[startingFrame].rootPos;
-                        pose.testHipHeight = pose.rootBone.position.y;
+                        pose.HipHeight = pose.rootBone.position.y;
 
                         pose.rootRot = pose.rootBone.rotation;
                     }
@@ -128,7 +127,6 @@ namespace MMSystem
 
                     if (m_poses[i].frame == 0)
                     {
-                        //m_poses[i].rootPos = new Vector3(0f, m_poses[i].rootPos.y, 0f);
                         m_poses[i].rootPos = Vector3.zero;
                         m_poses[i].deltaPos = Vector3.zero;
 
@@ -160,7 +158,6 @@ namespace MMSystem
                 AddVector3ToFeatureVector(m_features[i].m_FeatureVector, m_features[i].m_CurrentLFootPos, ref c);
                 AddVector3ToFeatureVector(m_features[i].m_FeatureVector, m_features[i].m_CurrentRFootPos, ref c);
                 AddVector3ToFeatureVector(m_features[i].m_FeatureVector, m_features[i].m_CurrentHipVel, ref c);
-                //AddVector3ToFeatureVector(m_features[i].m_FeatureVector, m_poses[m_features[i].poseIndex].dir * 5f, ref c);
 
                 //Trajectories
                 for (int j = 0; j < 3; j++)
@@ -204,10 +201,6 @@ namespace MMSystem
                 fv[i].m_CurrentLFootVel = fv[i + 1].m_CurrentLFootPos - fv[i].m_CurrentLFootPos;
                 fv[i].m_CurrentRFootVel = fv[i + 1].m_CurrentRFootPos - fv[i].m_CurrentRFootPos;
                 fv[i].m_CurrentHipVel = fv[i + 1].m_CurrentHipPos - fv[i].m_CurrentHipPos;
-
-                //fv[i].m_CurrentLFootVel = Vector3.Normalize(fv[i + 1].m_CurrentLFootPos - fv[i].m_CurrentLFootPos);
-                //fv[i].m_CurrentRFootVel = Vector3.Normalize(fv[i + 1].m_CurrentRFootPos - fv[i].m_CurrentRFootPos);
-                //fv[i].m_CurrentHipVel = Vector3.Normalize(fv[i + 1].m_CurrentHipPos - fv[i].m_CurrentHipPos);
             }
         }
 
@@ -253,7 +246,6 @@ namespace MMSystem
 
                 if (frameCount == 3)
                 {
-                    //fv.trajectories[tCount].m_FuturePos = new Vector3();
                     fv.trajectories[tCount].m_FuturePos = new Vector3(fullDelta.x, 0f, fullDelta.z);
                     fv.trajectories[tCount].m_FutureTime = frameCount;
                     tCount++;
@@ -261,7 +253,6 @@ namespace MMSystem
 
                 if (frameCount == 6) 
                 {
-                    //fv.trajectories[tCount].m_FuturePos = new Vector3();
                     fv.trajectories[tCount].m_FuturePos = new Vector3(fullDelta.x, 0f, fullDelta.z);
                     fv.trajectories[tCount].m_FutureTime = frameCount;
                     tCount++;
@@ -269,7 +260,6 @@ namespace MMSystem
 
                 if (frameCount == 9)
                 {
-                    //fv.trajectories[tCount].m_FuturePos = new Vector3();
                     fv.trajectories[tCount].m_FuturePos = new Vector3(fullDelta.x, 0f, fullDelta.z);
                     fv.trajectories[tCount].m_FutureTime = frameCount;
                     tCount++;
