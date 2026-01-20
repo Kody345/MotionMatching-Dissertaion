@@ -132,7 +132,7 @@ public class MMController : MonoBehaviour
             }
             else
             {
-                diff = 0;
+                diff = 0f;
             }
             
             totalCost += diff;

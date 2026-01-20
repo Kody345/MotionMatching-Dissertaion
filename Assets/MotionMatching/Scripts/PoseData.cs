@@ -3,6 +3,22 @@ using UnityEngine;
 
 namespace MMSystem
 {
+    public enum MotionEnum 
+    {
+        None = 0,
+        Walking = 1,
+        Crouching = 2,
+        Specific = 3
+    };
+
+    public enum MotionTypeEnum 
+    {
+        None = 0,
+        Drunk = 1,
+        Normal = 2,
+        Specific = 3
+    };
+
     public struct Trajectory 
     {
         public Vector3 m_FuturePos;

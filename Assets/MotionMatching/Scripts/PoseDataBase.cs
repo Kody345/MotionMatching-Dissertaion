@@ -1,17 +1,4 @@
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text.RegularExpressions;
-using Unity.VisualScripting;
-using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.Rendering;
-using UnityEngine.UIElements;
-using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
-using static UnityEditor.PlayerSettings;
 
 namespace MMSystem
 {
