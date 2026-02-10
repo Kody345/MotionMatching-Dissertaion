@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 307c94cfb673ca144964a283423edf0f, type: 3}
   m_Name: NormalCrouching
   m_EditorClassIdentifier: 
-  m_MotionType: 0
+  m_Motion: 2
   m_Clips: []

@@ -12,5 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e578912341ff191449c660ac01cfe5e0, type: 3}
   m_Name: Drunk
   m_EditorClassIdentifier: 
-  m_MotionType: 0
-  m_Motions: []
+  m_MotionType: 1
+  m_Motions:
+  - {fileID: 11400000, guid: 088467b7541cadf45ac795f01dd50d2c, type: 2}
+  - {fileID: 11400000, guid: b57cbb729cc093a4abe94ab62a8b0b33, type: 2}

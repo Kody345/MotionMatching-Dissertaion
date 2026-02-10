@@ -12,5 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 307c94cfb673ca144964a283423edf0f, type: 3}
   m_Name: NormalWalking
   m_EditorClassIdentifier: 
-  m_MotionType: 0
-  m_Clips: []
+  m_Motion: 1
+  m_Clips:
+  - {fileID: 7400000, guid: 180cf6cf1342cc64190f8d0fe6d6b4f5, type: 2}
+  - {fileID: 7400000, guid: 7e80dd9937582fc4d883b91e63519cdd, type: 2}
+  - {fileID: 7400000, guid: 2a3f1809af29ad147ba8ee20f01b8efd, type: 2}
+  - {fileID: 7400000, guid: a2b88f7b0c787ba468395cf5cd1ed755, type: 2}
+  - {fileID: 7400000, guid: dc54ea00cdbbdd740981da553d5c548b, type: 2}
