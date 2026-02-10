@@ -105,8 +105,9 @@ public class MMPlayerController : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.F))
         {
-            if (testCo == null)
-                testCo = StartCoroutine(AnimImplement(Vector3.right));
+            type = MotionTypeEnum.Drunk;
+            motion = MotionEnum.Walking;
+            speed = 1.5f;
         }
 
 

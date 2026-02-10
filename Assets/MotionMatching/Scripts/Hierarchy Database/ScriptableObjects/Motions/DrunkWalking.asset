@@ -12,5 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 307c94cfb673ca144964a283423edf0f, type: 3}
   m_Name: DrunkWalking
   m_EditorClassIdentifier: 
-  m_MotionType: 1
-  m_Clips: []
+  m_Motion: 1
+  m_Clips:
+  - {fileID: 7400000, guid: 969b8735426e01442ae0a1982bb7cea9, type: 2}
+  - {fileID: 7400000, guid: 719963899f635c14cae402f7a8ab2ac3, type: 2}

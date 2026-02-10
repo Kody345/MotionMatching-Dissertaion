@@ -15,3 +15,4 @@ MonoBehaviour:
   name: Bob
   m_MotionTypes:
   - {fileID: 11400000, guid: c553963012ae8a44496bfe6bb197c3fa, type: 2}
+  - {fileID: 11400000, guid: fbfbe8450d754f846ae35d17c6fdeb01, type: 2}
