@@ -5,5 +5,6 @@ using UnityEngine;
 public class Archtype : ScriptableObject
 {
     public string name;
+    public Archtype Parent;
     public MotionType[] m_MotionTypes;
 }

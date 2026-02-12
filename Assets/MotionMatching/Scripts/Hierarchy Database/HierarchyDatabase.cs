@@ -40,6 +40,8 @@ namespace MMSystem
             int poseCount = 0;
 
             dataHolder.m_Name = data.name;
+            if(data.Parent != null)
+                dataHolder.m_Parent = data.Parent.name;
 
             foreach (var mt in data.m_MotionTypes) 
             {

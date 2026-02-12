@@ -13,7 +13,7 @@ namespace MMSystem
 
     public class Dataset 
     {
-        public Dataset m_Parent;
+        public string m_Parent;
         public string m_Name;
         public Dictionary<MotionTypeEnum, Dictionary<MotionEnum, FeatureNode>> m_Types = new Dictionary<MotionTypeEnum, Dictionary<MotionEnum, FeatureNode>>();
         public Dictionary<MotionTypeEnum, Dictionary<MotionEnum, FeatureVector[]>> m_Features = new Dictionary<MotionTypeEnum, Dictionary<MotionEnum, FeatureVector[]>>();
@@ -48,7 +48,8 @@ namespace MMSystem
         None = 0,
         Drunk = 1,
         Normal = 2,
-        Specific = 3
+        Injured = 3,
+        Specific = 4
     };
 
     public struct Trajectory 

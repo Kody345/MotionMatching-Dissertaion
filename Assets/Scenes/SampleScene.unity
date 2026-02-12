@@ -2046,8 +2046,8 @@ MonoBehaviour:
   speed: 3.5
   m_PoseFavourWeight: 1
   m_PosWeight: 1
-  m_VelWeight: 40
-  m_TrajectoryWeighting: 50
+  m_VelWeight: 35
+  m_TrajectoryWeighting: 45
   m_frame1: 3
   m_frame2: 6
   m_frame3: 9

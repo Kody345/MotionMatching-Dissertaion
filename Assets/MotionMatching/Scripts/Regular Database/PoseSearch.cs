@@ -138,7 +138,7 @@ namespace MMSystem
                 }
             }
 
-            Debug.Log($"Index: {chosenFeature.poseIndex} Cost: {total}");
+            //Debug.Log($"Index: {chosenFeature.poseIndex} Cost: {total}");
 
             return chosenFeature;
         }

@@ -10,10 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: af8afe7177e16a44681f41362d52d7f4, type: 3}
-  m_Name: Bob
+  m_Name: Human Male
   m_EditorClassIdentifier: 
-  name: Bob
-  Parent: {fileID: 11400000, guid: b613ee2221909254380dca55bb6f170d, type: 2}
+  name: Human Male
+  ParentName: 
   m_MotionTypes:
-  - {fileID: 11400000, guid: c553963012ae8a44496bfe6bb197c3fa, type: 2}
-  - {fileID: 11400000, guid: fbfbe8450d754f846ae35d17c6fdeb01, type: 2}
+  - {fileID: 11400000, guid: c046cfad84664054ba7584c7911a4b86, type: 2}

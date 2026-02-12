@@ -144,11 +144,9 @@ public class MMController : MonoBehaviour
             AddVector3Cost(1f, vector.m_CurrentLFootPos, fv.m_CurrentLFootPos, ref totalCost);
             AddVector3Cost(VelocityWeighting, vector.m_CurrentHipVel, fv.m_CurrentHipVel, ref totalCost);
 
-            UnityEngine.Debug.Log($"Current Index: {vector.poseIndex} Testing Index: {fv.poseIndex} Before: {totalCost}");
             AddVector3Cost(TrajectoryWeighting, (direct * speed * time * 6f), fv.m_CurrentHipVel, ref totalCost);
             AddVector3Cost(TrajectoryWeighting, (direct * speed * time * 12), fv.m_CurrentHipVel, ref totalCost);
             AddVector3Cost(TrajectoryWeighting, (direct * speed * time * 18), fv.m_CurrentHipVel, ref totalCost);
-            UnityEngine.Debug.Log($"Current Index: {vector.poseIndex} Testing Index: {fv.poseIndex} After: {totalCost}");
 
             if (dist > totalCost)
             {
@@ -156,8 +154,6 @@ public class MMController : MonoBehaviour
                 i = p.feature.poseIndex;
             }
         }
-
-        UnityEngine.Debug.Log($"Chosen Index: {i}");
 
 
         foreach (var bone in bones)

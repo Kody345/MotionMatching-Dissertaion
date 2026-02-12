@@ -39,6 +39,16 @@ public class MotionMatchingManager : MonoBehaviour
         {
             return;
         }
+        if (m_DataSet.ContainsKey(pc.m_ArchType.Parent.name))
+        {
+            return;
+        }
+        else 
+        {
+            Dataset test = new Dataset();
+            m_DB.MakeDatabase(pc.anim, pc.m_ArchType.Parent, test, pc.RootBone, pc.LFoot, pc.RFoot);
+            m_DataSet.Add(pc.m_ArchType.Parent.name, test);
+        }
         Dataset dataset = new Dataset();
         m_DB.MakeDatabase(pc.anim, pc.m_ArchType, dataset, pc.RootBone, pc.LFoot, pc.RFoot);
         m_DataSet.Add(pc.m_ArchType.name, dataset);
@@ -48,17 +58,46 @@ public class MotionMatchingManager : MonoBehaviour
     {
         MMSystem.Pose pose = new MMSystem.Pose();
         Dataset dataset;
+        FeatureVector feature = new FeatureVector();
 
         m_DataSet.TryGetValue(name, out dataset);
-        dataset.m_Features.TryGetValue(type, out var data);
-        data.TryGetValue(motion, out var features);
+        bool foundData = false;
 
-        fv.trajectories = goal.m_Trajectories;
 
-        FeatureVector feature = m_PS.SearchFeatureArray(features, fv, weights, dataset.m_Magnitude);
+        while (!foundData) 
+        {
+            if (!dataset.m_Features.TryGetValue(type, out var data)) 
+            {
+                if (dataset.m_Parent == null)
+                    return new MMSystem.Pose();
+                m_DataSet.TryGetValue(dataset.m_Parent, out dataset);
+                if (dataset == null)
+                    break;
+                continue;
+            }
+
+            if (!data.TryGetValue(motion, out var features)) 
+            {
+                m_DataSet.TryGetValue(dataset.m_Parent, out dataset);
+                if (dataset == null)
+                    break;
+                continue;
+            }
+
+            fv.trajectories = goal.m_Trajectories;
+            feature = m_PS.SearchFeatureArray(features, fv, weights, dataset.m_Magnitude);
+            foundData = true;
+        }
+
+        if(!foundData)
+            return new MMSystem.Pose();
+
 
         pose = dataset.m_Poses[feature.poseIndex];
         pose.feature = feature;
+
+        Debug.Log($"Used Dataset: {dataset.m_Name}");
+
         return pose;
     }
 

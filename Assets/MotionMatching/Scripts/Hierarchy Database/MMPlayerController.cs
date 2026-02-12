@@ -51,7 +51,7 @@ public class MMPlayerController : MonoBehaviour
         if (m_ArchType == null)
             return;
 
-        UnityEngine.Debug.Log("efefr7gffufeuh");
+        //UnityEngine.Debug.Log("efefrgffufeuh");
 
         MotionMatchingManager.AddDataSet(this);
 
@@ -99,9 +99,9 @@ public class MMPlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.E))
         {
-            //MovementImplement(Vector3.back);
-            if (testCo == null)
-                testCo = StartCoroutine(AnimImplement(Vector3.forward));
+            type = MotionTypeEnum.Injured;
+            motion = MotionEnum.Walking;
+            speed = 1.5f;
         }
         if (Input.GetKeyDown(KeyCode.F))
         {
