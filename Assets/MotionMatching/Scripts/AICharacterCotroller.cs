@@ -4,7 +4,7 @@ using System.Collections;
 using System.Diagnostics;
 using UnityEngine;
 
-public class MMPlayerController : MonoBehaviour
+public class AICharacterCotroller : MonoBehaviour
 {
     [SerializeField] private SearchAndSaveType m_DatabaseType;
     public Archtype m_ArchType;
@@ -35,6 +35,7 @@ public class MMPlayerController : MonoBehaviour
     private MotionEnum motion;
     private Goal m_goal = new Goal();
     private Vector3 test = new Vector3();
+    private int test2 = 0;
 
     private void OnValidate()
     {
@@ -42,9 +43,9 @@ public class MMPlayerController : MonoBehaviour
         if (m_ArchType == null)
             return;
 
-        //UnityEngine.Debug.Log("efefffufeuh");
+        //UnityEngine.Debug.Log("efeffffufeuh");
 
-        MotionMatchingManager.AddDataSet(this);
+        MotionMatchingManager.AddDataSet2(this);
         long after = GC.GetTotalMemory(true);
 
         Logging.LogMemory(gameObject.name, after - before, 0.0f);
@@ -86,55 +87,38 @@ public class MMPlayerController : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            System.Random rnd = new System.Random();
+            test2 = rnd.Next(1, 5);
+        }
+
         if (trip)
             return;
-        if (Input.GetKeyDown(KeyCode.Space))
+
+        switch (test2) 
         {
-            StartCoroutine(AnimImplement(Vector3.zero));
+            case 1:
+                if (testCo == null)
+                    testCo = StartCoroutine(AnimImplement(Vector3.forward));
+                break;
+            case 2:
+                if (testCo == null)
+                    testCo = StartCoroutine(AnimImplement(Vector3.right));
+                break;
+            case 3:
+                if (testCo == null)
+                    testCo = StartCoroutine(AnimImplement(Vector3.left));
+                break;
+            case 4:
+                if (testCo == null)
+                    testCo = StartCoroutine(AnimImplement(Vector3.back));
+                break;
+            default:
+                break;
         }
 
-        if (Input.GetKey(KeyCode.G))
-        {
-            //MovementImplement(Vector3.back);
-            if (testCo == null)
-                testCo = StartCoroutine(AnimImplement(Vector3.forward));
-        }
-
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            type = MotionTypeEnum.Injured;
-            motion = MotionEnum.Walking;
-            speed = 1.5f;
-        }
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            type = MotionTypeEnum.Drunk;
-            motion = MotionEnum.Walking;
-            speed = 1.5f;
-        }
-
-
-        if (Input.GetKey(KeyCode.W))
-        {
-            //MovementImplement(Vector3.back);
-            if (testCo == null)
-                testCo = StartCoroutine(AnimImplement(Vector3.forward));
-        }
-        if (Input.GetKey(KeyCode.A))
-        {
-            if (testCo == null)
-                testCo = StartCoroutine(AnimImplement(Vector3.left));
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-            if (testCo == null)
-                testCo = StartCoroutine(AnimImplement(Vector3.right));
-        }
-        if (Input.GetKey(KeyCode.S))
-        {
-            if (testCo == null)
-                testCo = StartCoroutine(AnimImplement(Vector3.back));
-        }
+        
 
     }
 
@@ -202,5 +186,4 @@ public class MMPlayerController : MonoBehaviour
         //Gizmos.DrawCube(currentVector.trajectories[1].m_FuturePos, new Vector3(origin, origin, origin));
         //Gizmos.DrawCube(currentVector.trajectories[2].m_FuturePos, new Vector3(origin, origin, origin));
     }
-
 }

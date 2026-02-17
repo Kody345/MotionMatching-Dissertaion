@@ -55,8 +55,8 @@ namespace MMSystem
     public struct Trajectory 
     {
         public Vector3 m_FuturePos;
-        public Vector3 m_ForwardDir;
-        public float m_FutureTime;
+        //public Vector3 m_ForwardDir;
+        //public float m_FutureTime;
     }
 
     public struct FeatureVector 

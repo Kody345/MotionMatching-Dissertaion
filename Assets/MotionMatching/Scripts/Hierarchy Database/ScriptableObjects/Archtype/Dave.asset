@@ -12,3 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af8afe7177e16a44681f41362d52d7f4, type: 3}
   m_Name: Dave
   m_EditorClassIdentifier: 
+  name: Dave
+  Parent: {fileID: 11400000, guid: 86e9332d951f2ea439b1698530910496, type: 2}
+  m_MotionTypes:
+  - {fileID: 11400000, guid: c046cfad84664054ba7584c7911a4b86, type: 2}

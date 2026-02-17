@@ -276,27 +276,28 @@ namespace MMSystem
 
             for (float i = (fv.poseIndex / 30f) + 1f / 30f; i < fullTime; i += 1f / 30f)
             {
-
+                if ((int)(i * 30f) >= poses.Length)
+                    return;
                 fullDelta += poses[(int)(i * 30f)].deltaPos;
 
                 if (frameCount == 3)
                 {
                     fv.trajectories[tCount].m_FuturePos = new Vector3(fullDelta.x, 0f, fullDelta.z);
-                    fv.trajectories[tCount].m_FutureTime = frameCount;
+                    //fv.trajectories[tCount].m_FutureTime = frameCount;
                     tCount++;
                 }
 
                 if (frameCount == 6) 
                 {
                     fv.trajectories[tCount].m_FuturePos = new Vector3(fullDelta.x, 0f, fullDelta.z);
-                    fv.trajectories[tCount].m_FutureTime = frameCount;
+                    //fv.trajectories[tCount].m_FutureTime = frameCount;
                     tCount++;
                 }
 
                 if (frameCount == 9)
                 {
                     fv.trajectories[tCount].m_FuturePos = new Vector3(fullDelta.x, 0f, fullDelta.z);
-                    fv.trajectories[tCount].m_FutureTime = frameCount;
+                    //fv.trajectories[tCount].m_FutureTime = frameCount;
                     tCount++;
                 }
 

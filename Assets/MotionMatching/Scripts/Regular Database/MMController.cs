@@ -1,12 +1,12 @@
 using MMSystem;
+using System;
 using System.Collections;
 using System.Diagnostics;
 using UnityEngine;
 
 public class MMController : MonoBehaviour
 {
-    private PoseDataBase m_PDB = new PoseDataBase();
-    private HierarchyDatabase m_HD = new HierarchyDatabase();
+    //private PoseDataBase m_PDB = new PoseDataBase();
 
     [Header("Setup")]
     [SerializeField] private AnimationClip[] clips;
@@ -21,7 +21,6 @@ public class MMController : MonoBehaviour
     [SerializeField] private float speed = 0;
     [SerializeField] private float TrajectoryWeighting = 1f;
     [SerializeField] private float VelocityWeighting = 1f;
-    [SerializeField] private Archtype m_set;
 
     private MMSystem.Pose pose = new MMSystem.Pose();
     private Transform[] bones;
@@ -45,12 +44,13 @@ public class MMController : MonoBehaviour
             }
             m_Poses = new MMSystem.Pose[(int)frames];
             m_Features = new MMSystem.FeatureVector[(int)frames];
+            //UnityEngine.Debug.Log("efefffufeuh");
 
-
-            //Dataset dataset = new Dataset();
-            //m_HD.MakeDatabase(anim, m_set, dataset, m_RootBone, m_LFootBone, m_RFootBone, ref magnitude);
-
-            m_PDB.ConvertData(m_Poses, m_Features, clips, anim, m_SST, m_LFootBone, m_RFootBone, m_RootBone, ref magnitude);
+            PoseDataBase test = new PoseDataBase();
+            long before = GC.GetTotalMemory(true);
+            test.ConvertData(m_Poses, m_Features, clips, anim, m_SST, m_LFootBone, m_RFootBone, m_RootBone, ref magnitude);
+            long after = GC.GetTotalMemory(true);
+            //Logging.LogMemory(gameObject.name, after - before, 0.0f);
 
         }
     }

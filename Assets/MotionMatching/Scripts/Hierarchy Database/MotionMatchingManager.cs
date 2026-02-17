@@ -1,4 +1,5 @@
 using MMSystem;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -35,7 +36,7 @@ public class MotionMatchingManager : MonoBehaviour
 
     public static void AddDataSet(MMPlayerController pc) 
     {
-        if (m_DataSet.ContainsKey(pc.m_ArchType.name)) 
+        /*if (m_DataSet.ContainsKey(pc.m_ArchType.name)) 
         {
             return;
         }
@@ -51,7 +52,69 @@ public class MotionMatchingManager : MonoBehaviour
         }
         Dataset dataset = new Dataset();
         m_DB.MakeDatabase(pc.anim, pc.m_ArchType, dataset, pc.RootBone, pc.LFoot, pc.RFoot);
-        m_DataSet.Add(pc.m_ArchType.name, dataset);
+        m_DataSet.Add(pc.m_ArchType.name, dataset);*/
+        long before = GC.GetTotalMemory(true);
+
+        if (pc.m_ArchType.Parent != null && !m_DataSet.ContainsKey(pc.m_ArchType.Parent.name))
+        {
+            Dataset parentDataset = new Dataset();
+            m_DB.MakeDatabase(pc.anim, pc.m_ArchType.Parent, parentDataset,
+                pc.RootBone, pc.LFoot, pc.RFoot);
+
+            m_DataSet.Add(pc.m_ArchType.Parent.name, parentDataset);
+        }
+        // Add this character if missing
+        if (!m_DataSet.ContainsKey(pc.m_ArchType.name))
+        {
+            Dataset dataset = new Dataset();
+            m_DB.MakeDatabase(pc.anim, pc.m_ArchType, dataset,
+                pc.RootBone, pc.LFoot, pc.RFoot);
+
+            m_DataSet.Add(pc.m_ArchType.name, dataset);
+        }
+        long after = GC.GetTotalMemory(true);
+    }
+
+    public static void AddDataSet2(AICharacterCotroller pc)
+    {
+        /*if (m_DataSet.ContainsKey(pc.m_ArchType.name)) 
+        {
+            return;
+        }
+        if (m_DataSet.ContainsKey(pc.m_ArchType.Parent.name))
+        {
+            return;
+        }
+        else 
+        {
+            Dataset test = new Dataset();
+            m_DB.MakeDatabase(pc.anim, pc.m_ArchType.Parent, test, pc.RootBone, pc.LFoot, pc.RFoot);
+            m_DataSet.Add(pc.m_ArchType.Parent.name, test);
+        }
+        Dataset dataset = new Dataset();
+        m_DB.MakeDatabase(pc.anim, pc.m_ArchType, dataset, pc.RootBone, pc.LFoot, pc.RFoot);
+        m_DataSet.Add(pc.m_ArchType.name, dataset);*/
+        long before = GC.GetTotalMemory(true);
+
+        if (pc.m_ArchType.Parent != null && !m_DataSet.ContainsKey(pc.m_ArchType.Parent.name))
+        {
+            Dataset parentDataset = new Dataset();
+            m_DB.MakeDatabase(pc.anim, pc.m_ArchType.Parent, parentDataset,
+                pc.RootBone, pc.LFoot, pc.RFoot);
+
+            m_DataSet.Add(pc.m_ArchType.Parent.name, parentDataset);
+        }
+        // Add this character if missing
+        if (!m_DataSet.ContainsKey(pc.m_ArchType.name))
+        {
+            Dataset dataset = new Dataset();
+            m_DB.MakeDatabase(pc.anim, pc.m_ArchType, dataset,
+                pc.RootBone, pc.LFoot, pc.RFoot);
+
+            m_DataSet.Add(pc.m_ArchType.name, dataset);
+        }
+        long after = GC.GetTotalMemory(true);
+
     }
 
     public static MMSystem.Pose GetPose(string name, MotionTypeEnum type, MotionEnum motion, FeatureVector fv, Goal goal, Weightings weights) 
@@ -78,6 +141,8 @@ public class MotionMatchingManager : MonoBehaviour
 
             if (!data.TryGetValue(motion, out var features)) 
             {
+                if (dataset.m_Parent == null)
+                    return new MMSystem.Pose();
                 m_DataSet.TryGetValue(dataset.m_Parent, out dataset);
                 if (dataset == null)
                     break;

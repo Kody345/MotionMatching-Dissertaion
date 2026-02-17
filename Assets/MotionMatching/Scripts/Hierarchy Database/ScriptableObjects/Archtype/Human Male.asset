@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Human Male
   m_EditorClassIdentifier: 
   name: Human Male
-  ParentName: 
+  Parent: {fileID: 11400000, guid: 86e9332d951f2ea439b1698530910496, type: 2}
   m_MotionTypes:
-  - {fileID: 11400000, guid: c046cfad84664054ba7584c7911a4b86, type: 2}
+  - {fileID: 11400000, guid: c553963012ae8a44496bfe6bb197c3fa, type: 2}
