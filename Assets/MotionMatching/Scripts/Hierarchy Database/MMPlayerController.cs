@@ -140,6 +140,8 @@ public class MMPlayerController : MonoBehaviour
 
     IEnumerator AnimImplement(Vector3 dir)
     {
+        long before = GC.GetTotalMemory(true);
+
         float interval = 1f / 30f;
         var timer = new Stopwatch();
         timer.Start();
@@ -176,6 +178,10 @@ public class MMPlayerController : MonoBehaviour
 
         nextTime += interval;
         float wait = nextTime - (float)timer.Elapsed.TotalSeconds;
+
+        long after = GC.GetTotalMemory(true);
+        UnityEngine.Debug.Log(after - before);
+        Logging.LogForAverage(after - before, 0.0f);
 
         if (wait > 0f)
         {

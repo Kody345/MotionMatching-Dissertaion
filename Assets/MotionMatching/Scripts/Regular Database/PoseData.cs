@@ -73,6 +73,9 @@ namespace MMSystem
 
         public float[] m_FeatureVector;
         public int poseIndex;
+
+        public float[] m_mean;
+        public float[] m_stdDevs;
     }
 
     public struct Bone 

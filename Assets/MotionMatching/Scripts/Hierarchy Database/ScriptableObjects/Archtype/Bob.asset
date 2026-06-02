@@ -16,3 +16,4 @@ MonoBehaviour:
   Parent: {fileID: 11400000, guid: b613ee2221909254380dca55bb6f170d, type: 2}
   m_MotionTypes:
   - {fileID: 11400000, guid: fbfbe8450d754f846ae35d17c6fdeb01, type: 2}
+  - {fileID: 11400000, guid: c046cfad84664054ba7584c7911a4b86, type: 2}

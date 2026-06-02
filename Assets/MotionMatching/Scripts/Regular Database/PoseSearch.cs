@@ -162,8 +162,6 @@ namespace MMSystem
                 AddVector3Cost(weights.TrajectoryWeighting, fv.trajectories[i].m_FuturePos, tester.trajectories[i].m_FuturePos, ref total, magnitude);
             }
 
-            //Debug.Log($"Current Index: {fv.poseIndex} Test Index: {tester.poseIndex} Total: {total}");
-
             return total;
         }
 
