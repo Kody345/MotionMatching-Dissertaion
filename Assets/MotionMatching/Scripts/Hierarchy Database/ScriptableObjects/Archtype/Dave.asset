@@ -14,5 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   name: Dave
   Parent: {fileID: 11400000, guid: 86e9332d951f2ea439b1698530910496, type: 2}
-  m_MotionTypes:
-  - {fileID: 11400000, guid: c046cfad84664054ba7584c7911a4b86, type: 2}
+  m_MotionTypes: []
